@@ -1,27 +1,3 @@
-terraform {
-  required_version = ">= 1.5.0"   # Terraform CLI version (optional)
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = ">= 5.15"       # <-- minimum provider version that supports iam_arn
-    }
-  }
-}
-
-#-------------------------
-# 1. Provider
-#-------------------------
-provider "aws" {
-  region = "us-east-1"
-}
-
-#-------------------------
-# 1.1 Random suffixes for unique names
-#-------------------------
-resource "random_id" "data_suffix" { byte_length = 4 }
-resource "random_id" "frontend_suffix" { byte_length = 4 }
-
-#-------------------------
 # 2. KMS Key for data bucket encryption
 #-------------------------
 resource "aws_kms_key" "s3_bucket_key" {
@@ -29,13 +5,6 @@ resource "aws_kms_key" "s3_bucket_key" {
   deletion_window_in_days = 10
 }
 
-#-------------------------
-# 3. S3 Data Bucket
-#-------------------------
-resource "aws_s3_bucket" "secure_bucket" {
-  bucket = "secure-lab-data-uploads-${random_id.data_suffix.hex}"
-  object_lock_enabled = true
-}
 
 #-------------------------
 # 4. Server-side encryption for data bucket
@@ -52,40 +21,6 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "bucket_encryption
 }
 
 #-------------------------
-# 5. Block public access for data bucket
-#-------------------------
-resource "aws_s3_bucket_public_access_block" "block_public_access" {
-  bucket                  = aws_s3_bucket.secure_bucket.id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
-
-#-------------------------
-# 6. Frontend Bucket
-#-------------------------
-resource "aws_s3_bucket" "frontend_bucket" {
-  bucket = "secure-lab-frontend-${random_id.frontend_suffix.hex}"
-
-  tags = {
-    Name        = "SecureLabFrontend"
-    Environment = "Dev"
-  }
-}
-
-#-------------------------
-# 7. Block public access for frontend bucket
-#-------------------------
-resource "aws_s3_bucket_public_access_block" "frontend_block" {
-  bucket                  = aws_s3_bucket.frontend_bucket.id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
-
-#-------------------------
 # 8. CloudFront Origin Access Control (OAC)
 #-------------------------
 resource "aws_cloudfront_origin_access_control" "frontend_oac" {
@@ -94,28 +29,6 @@ resource "aws_cloudfront_origin_access_control" "frontend_oac" {
   signing_behavior                  = "always"
   signing_protocol                  = "sigv4"
 }
-
-#-------------------------
-# 9. Frontend Bucket Policy for CloudFront OAC
-#-------------------------
-resource "aws_s3_bucket_policy" "frontend_bucket_policy" {
-  bucket = aws_s3_bucket.frontend_bucket.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Principal = {
-          Service = "cloudfront.amazonaws.com"
-        }
-        Action   = "s3:GetObject"
-        Resource = "${aws_s3_bucket.frontend_bucket.arn}/*"
-      }
-    ]
-  })
-}
-
 
 # 10. ACM Certificate
 resource "aws_acm_certificate" "cert" {
