@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Lab Report Upload</title>
+</head>
+<body>
+  <h2>Upload Lab Report</h2>
+  <input type="file" id="fileInput" />
+  <button onclick="uploadFile()">Upload</button>
+
+  <script>
+    async function uploadFile() {
+      const file = document.getElementById("fileInput").files[0];
+      if (!file) return alert("No file selected");
+
+      // Call API Gateway endpoint to get presigned URL
+      const response = await fetch(`YOUR_API_GATEWAY_URL?filename=${file.name}`);
+      const data = await response.json();
+
+      // Upload directly to S3
+      const upload = await fetch(data.upload_url, {
+        method: "PUT",
+        body: file
+      });
+
+      if (upload.ok) {
+        alert("Upload successful!");
+      } else {
+        alert("Upload failed.");
+      }
+    }
+  </script>
+</body>
+</html>
