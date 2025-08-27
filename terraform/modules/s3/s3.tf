@@ -15,13 +15,15 @@ resource "aws_s3_bucket_public_access_block" "block_public_access" {
   restrict_public_buckets = true
 }
 
-# 6. Frontend Bucket
-#-------------------------
-#resource "aws_s3_bucket" "frontend_bucket" {
-#  bucket = "secure-lab-frontend-${random_id.frontend_suffix.hex}"
+# Enable server-side encryption with KMS if enabled
+resource "aws_s3_bucket_server_side_encryption_configuration" "bucket_encryption" {
+  count  = var.enable_bucket_encryption ? 1 : 0
+  bucket = aws_s3_bucket.secure_s3_bucket.id
 
-#  tags = {
-#    Name        = "SecureLabFrontend"
-#    Environment = "Dev"
-#  }
-#}
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "aws:kms"
+      kms_master_key_id = var.kms_key_arn
+    }
+  }
+}

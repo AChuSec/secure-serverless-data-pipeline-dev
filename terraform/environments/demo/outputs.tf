@@ -1,3 +1,4 @@
+#s3 bucket outputs
 output "data_bucket_name" {
   description = "Name of the data S3 bucket"
   value       = module.data_bucket.bucket_name
@@ -27,3 +28,9 @@ output "frontend_bucket_id" {
   description = "ID of the frontend S3 bucket"
   value       = module.frontend_bucket.bucket_id
 }
+
+output "data_bucket_kms_key_arn" {
+description = "ARN of the KMS key used for data S3 bucket encryption"
+  value = aws_kms_key.s3_bucket_key.arn
+}
+

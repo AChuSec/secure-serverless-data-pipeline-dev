@@ -31,6 +31,13 @@ provider "aws" {
   }
 }
 
+# create KMS key for S3 bucket encryption
+resource "aws_kms_key" "s3_bucket_key" {
+  description             = "KMS key for S3 bucket encryption"
+  deletion_window_in_days = 10
+}
+
+
 #-------------------------
 # 1.1 Random suffixes for unique names
 #-------------------------
@@ -44,6 +51,9 @@ module "data_bucket" {
   object_lock_enabled = var.objectlockTF
   versioning          = var.versioning
   bucket_policy       = null
+
+  enable_bucket_encryption = true
+  kms_key_arn = aws_kms_key.s3_bucket_key.arn
 }
 
 # create frontend bucket, public access blocked by default
@@ -53,6 +63,7 @@ module "frontend_bucket" {
   object_lock_enabled = var.objectlockTF
   versioning          = var.versioning
   bucket_policy       = var.frontend_bucket_policy
+
 }
 
 
@@ -67,4 +78,19 @@ resource "aws_s3_object" "frontend_html" {
     aws_cloudfront_origin_access_control.frontend_oac,
     aws_s3_bucket_policy.frontend_bucket_policy
   ]
+}
+
+# create upload lambda
+module "upload_lambda" {
+  function_name       = var.upload_lambda_name
+  lambda_role_arn     = aws_iam_role.lambda_s3_uploader.arn #need to add IAM
+  handler             = "upload_lambda_function.lambda_handler"
+  runtime            = var.runtime
+
+  source              = "../../modules/lambda"
+  source_file         = "${path.module}/upload_lambda_function.py"
+
+  environment_variables = {
+    UPLOAD_BUCKET = aws_s3_bucket.data_bucket.bucket
+  }
 }

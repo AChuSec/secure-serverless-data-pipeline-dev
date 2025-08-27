@@ -1,25 +1,3 @@
-## 2. KMS Key for data bucket encryption
-#-------------------------
-resource "aws_kms_key" "s3_bucket_key" {
-  description             = "KMS key for S3 bucket encryption"
-  deletion_window_in_days = 10
-}
-
-
-#-------------------------
-# 4. Server-side encryption for data bucket
-#-------------------------
-resource "aws_s3_bucket_server_side_encryption_configuration" "bucket_encryption" {
-  bucket = aws_s3_bucket.secure_bucket.id
-
-  rule {
-    apply_server_side_encryption_by_default {
-      kms_master_key_id = aws_kms_key.s3_bucket_key.arn
-      sse_algorithm     = "aws:kms"
-    }
-  }
-}
-
 #-------------------------
 # 8. CloudFront Origin Access Control (OAC)
 #-------------------------
@@ -136,19 +114,4 @@ resource "aws_cloudfront_distribution" "frontend_cdn" {
       restriction_type = "none"
     }
   }
-}
-
-#-------------------------
-# 14. Upload frontend.html to frontend bucket
-#-------------------------
-resource "aws_s3_object" "frontend_html" {
-  bucket       = aws_s3_bucket.frontend_bucket.id
-  key          = "frontend.html"
-  source       = "${path.module}/frontend.html"
-  content_type = "text/html"
-
-  depends_on = [
-    aws_cloudfront_origin_access_control.frontend_oac,
-    aws_s3_bucket_policy.frontend_bucket_policy
-  ]
 }
