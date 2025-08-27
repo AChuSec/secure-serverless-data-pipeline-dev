@@ -1,4 +1,4 @@
-# 2. KMS Key for data bucket encryption
+## 2. KMS Key for data bucket encryption
 #-------------------------
 resource "aws_kms_key" "s3_bucket_key" {
   description             = "KMS key for S3 bucket encryption"
