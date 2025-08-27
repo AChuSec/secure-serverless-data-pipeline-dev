@@ -1,27 +1,4 @@
 #-------------------------
-# S3 Bucket Outputs
-#-------------------------
-output "secure_bucket_name" {
-  description = "Name of the secure data S3 bucket"
-  value       = aws_s3_bucket.secure_bucket.bucket
-}
-
-output "secure_bucket_arn" {
-  description = "ARN of the secure data S3 bucket"
-  value       = aws_s3_bucket.secure_bucket.arn
-}
-
-output "frontend_bucket_name" {
-  description = "Name of the frontend S3 bucket"
-  value       = aws_s3_bucket.frontend_bucket.bucket
-}
-
-output "frontend_bucket_arn" {
-  description = "ARN of the frontend S3 bucket"
-  value       = aws_s3_bucket.frontend_bucket.arn
-}
-
-#-------------------------
 # CloudFront Outputs
 #-------------------------
 output "cloudfront_distribution_id" {
