@@ -14,10 +14,10 @@ output "cloudfront_domain_name" {
 #-------------------------
 # ACM Certificate Output
 #-------------------------
-output "acm_certificate_arn" {
-  description = "ARN of the ACM certificate for CloudFront"
-  value       = aws_acm_certificate.cert.arn
-}
+# output "acm_certificate_arn" {
+#   description = "ARN of the ACM certificate for CloudFront"
+#   value       = aws_acm_certificate.cert.arn
+# }
 
 #-------------------------
 # WAF Web ACL Output

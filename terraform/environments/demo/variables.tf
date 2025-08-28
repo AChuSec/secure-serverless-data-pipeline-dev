@@ -36,10 +36,6 @@ variable "data_bucket_policy" {
   type = string
 }
 
-variable "frontend_bucket_policy" {
-  type = string
-}
-
 # lambda module
 variable "upload_lambda_name" {
   type        = string

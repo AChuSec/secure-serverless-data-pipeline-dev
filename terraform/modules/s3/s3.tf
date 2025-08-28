@@ -3,7 +3,7 @@
 resource "aws_s3_bucket" "secure_s3_bucket" {
   bucket                = var.bucket_name
   object_lock_enabled   = var.object_lock_enabled
-  policy                = var.bucket_policy
+#  policy                = var.bucket_policy
 }
 
 # Block public access for S3 bucket by default

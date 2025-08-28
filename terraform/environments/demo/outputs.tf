@@ -34,3 +34,12 @@ description = "ARN of the KMS key used for data S3 bucket encryption"
   value = aws_kms_key.s3_bucket_key.arn
 }
 
+output "acm_certificate_arn" {
+  description = "ARN of the validated ACM certificate"
+  value       = module.acm_certificate.acm_certificate_arn
+}
+
+output "acm_certificate_domain_name" {
+  description = "Domain name of the ACM certificate"
+  value       = module.acm_certificate.acm_certificate_domain_name
+}
