@@ -1,7 +1,7 @@
 # 12. WAF Web ACL
-
+#
 resource "aws_wafv2_web_acl" "web_acl" {
-  name        = "${var.bucket_name}-waf-${random_id.frontend_suffix.hex}"
+  name        = var.waf_name
   scope       = "CLOUDFRONT"
   description = "WAF ACL for frontend website"
 

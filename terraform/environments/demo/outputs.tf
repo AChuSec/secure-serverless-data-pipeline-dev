@@ -43,3 +43,28 @@ output "acm_certificate_domain_name" {
   description = "Domain name of the ACM certificate"
   value       = module.acm_certificate.acm_certificate_domain_name
 }
+
+output "cloudfront_distribution_id" {
+  description = "ID of the CloudFront distribution"
+  value       = module.cloudfront.distribution_id
+}
+
+output "cloudfront_distribution_domain_name" {
+  description = "Domain name of the CloudFront distribution"
+  value       = module.cloudfront.distribution_domain_name
+}
+
+output "waf_web_acl_arn" {
+  description = "ARN of the WAF Web ACL"
+  value       = module.waf.web_acl_arn
+}
+
+output "cloudfront_oac_id" {
+  description = "ID of the CloudFront Origin Access Control"
+  value       = module.cloudfront_oac.origin_access_control_id
+}
+
+output "upload_lambda_function_name" {
+  description = "Name of the upload Lambda function"
+  value       = module.upload_lambda.function_name
+}

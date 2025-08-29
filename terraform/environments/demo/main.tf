@@ -142,24 +142,26 @@ resource "aws_s3_object" "frontend_html" {
 
 # CloudFront Origin Access Control
 module "cloudfront_oac" {
-  source            = "../../modules/cloudfront"
-  oac_name          = "${var.project_name}-oac-${random_id.frontend_suffix.hex}-frontend"
-  origin_type       = "s3"
-  signing_behavior  = "always"
-  signing_protocol  = "sigv4"
+  source                     = "../../modules/cloudfront_oac"
+  oac_name                   = "${var.project_name}-oac-${random_id.frontend_suffix.hex}-frontend"
+  origin_type                = "s3"
+  signing_behavior           = "always"
+  signing_protocol           = "sigv4"
 }
 
-# module "frontend_cdn" {
-#   source                     = "../../modules/cloudfront"
-#   distribution_name          = "${var.project_name}-cdn-${var.environment}"
-#   origin_domain_name         = module.frontend_bucket.bucket_regional_domain_name
-#   origin_id                  = "S3-${module.frontend_bucket.bucket_name}"
-#   origin_access_control_id   = module.cloudfront_oac.origin_access_control_id
-#   web_acl_id                 = aws_wafv2_web_acl.web_acl.arn
-#   acm_certificate_arn        = aws_acm_certificate.cert.arn
-#   default_root_object        = "frontend.html"
-#   price_class                = "PriceClass_100"
-# }
+# Create Cloudfront (dependent on ACM, WAF, OAC)
+module "cloudfront" {
+  source                     = "../../modules/cloudfront"
+  #default_root_object        = "frontend.html" #default set in module
+  web_acl_id                 = module.waf.web_acl_id
+  distribution_name          = "${var.project_name}-cdn-${var.environment}"
+  origin_id                  = "S3-${module.frontend_bucket.bucket_name}"
+  origin_access_control_id   = module.cloudfront_oac.origin_access_control_id
+  origin_domain_name         = module.frontend_bucket.bucket_regional_domain_name
+  # price_class = "PriceClass_100" #default set in module
+  acm_certificate_arn        = module.acm_certificate.certificate_arn
+}
+
 
 #make acm cert
 module "acm_certificate" {
@@ -174,9 +176,19 @@ module "acm_dns_validation" {
   route53_zone_id         = var.route53_zone_id
 }
 
-#resource "aws_cloudfront_distribution" "frontend_cdn" {
-#  viewer_certificate {
-#    acm_certificate_arn = module.acm_certificate.acm_certificate_arn
-#    ...
-#  }
-#}
+# 12. WAF Web ACL
+#
+module "waf" {
+  source    = "../../modules/waf"
+  waf_name  = "${module.frontend_bucket.bucket_name}-waf-${random_id.frontend_suffix.hex}"
+}
+
+# Route 53
+module "route53" {
+  source                    = "../../modules/route53"
+  route_53_zone_id                   = var.route53_zone_id
+  domain_name               = var.domain_name
+  cloudfront_domain_name    = module.cloudfront.distribution_domain_name
+  domain_validation_options = module.acm_certificate.domain_validation_options
+}
+

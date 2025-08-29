@@ -1,13 +1,3 @@
-output "origin_access_control_id" {
-  description = "ID of the CloudFront Origin Access Control"
-  value       = aws_cloudfront_origin_access_control.oac.id
-}
-
-output "origin_access_control_name" {
-  description = "Name of the CloudFront Origin Access Control"
-  value       = aws_cloudfront_origin_access_control.oac.name
-}
-
 output "distribution_id" {
   value       = aws_cloudfront_distribution.cdn.id
   description = "ID of the CloudFront distribution"
@@ -16,4 +6,8 @@ output "distribution_id" {
 output "distribution_domain_name" {
   value       = aws_cloudfront_distribution.cdn.domain_name
   description = "Domain name of the CloudFront distribution"
+}
+
+output "cloudfront_distribution" {
+  value = aws_cloudfront_distribution.frontend_cdn
 }
