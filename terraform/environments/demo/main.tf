@@ -159,7 +159,7 @@ module "cloudfront" {
   origin_access_control_id   = module.cloudfront_oac.origin_access_control_id
   origin_domain_name         = module.frontend_bucket.bucket_regional_domain_name
   # price_class = "PriceClass_100" #default set in module
-  acm_certificate_arn        = module.acm_certificate.certificate_arn
+  acm_certificate_arn        = module.acm_dns_validation.validated_certificate_arn
 }
 
 
@@ -171,7 +171,7 @@ module "acm_certificate" {
 
 module "acm_dns_validation" {
   source                  = "../../modules/acm_dns_validation"
-  certificate_arn         = module.acm_certificate.certificate_arn
+  certificate_arn         = module.acm_certificate.acm_certificate_arn
   domain_validation_options = module.acm_certificate.domain_validation_options
   route53_zone_id         = var.route53_zone_id
 }

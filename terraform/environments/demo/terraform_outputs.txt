@@ -1,0 +1,6 @@
+data_bucket_name     = "demo-secure-lab-data-uploads-d401bd5c"
+data_bucket_arn      = "arn:aws:s3:::demo-secure-lab-data-uploads-d401bd5c"
+data_bucket_id       = "demo-secure-lab-data-uploads-d401bd5c"
+frontend_bucket_name = "demo-secure-lab-frontend-ab94a927"
+frontend_bucket_arn  = "arn:aws:s3:::demo-secure-lab-frontend-ab94a927"
+frontend_bucket_id   = "demo-secure-lab-frontend-ab94a927"
